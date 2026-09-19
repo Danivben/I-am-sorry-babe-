@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miles Apart, But You're My Whole Heart 🪷❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            pink: '#FFE5EC',
+                            rose: '#FFC2D1',
+                            deepRose: '#FFB3C6',
+                            cream: '#FFF9F5',
+                            lavender: '#F0E6FF',
+                            accent: '#FF85A1',
+                            darkRose: '#D85A7F',
+                            sage: '#E3EBD8',
+                            leaf: '#C1D7C1',
+                            sky: '#E0F2FE'
+                        }
+                    },
+                    fontFamily: {
+                        handwriting: ['Caveat', 'cursive'],
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFF9F5;
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Floating particles background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Glassmorphism containers */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 194, 209, 0.5);
+            box-shadow: 0 10px 30px rgba(255, 133, 161, 0.1);
+        }
+
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 15px 35px rgba(255, 133, 161, 0.2);
+        }
+
+        /* Envelope Unfold Animation */
+        .envelope-wrapper {
+            perspective: 1000px;
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .letter-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.8s cubic-bezier(0, 1, 0, 1), opacity 0.5s ease-in-out;
+        }
+
+        .envelope.open .letter-content {
+            max-height: 2000px;
+            opacity: 1;
+            transition: max-height 1.2s cubic-bezier(0.9, 0, 0.1, 1), opacity 0.8s ease-in-out 0.3s;
+        }
+
+        /* Custom Pulse Animations */
+        @keyframes subtlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse-gentle {
+            animation: subtlePulse 3s infinite ease-in-out;
+        }
+
+        /* Flight Trail Animation */
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -40;
+            }
+        }
+
+        .animate-dash {
+            stroke-dasharray: 8, 8;
+            animation: dash 2s linear infinite;
+        }
+
+        /* Pulse glow for hearts on map */
+        @keyframes mapPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 133, 161, 0.7); }
+            70% { transform: scale(1.15); box-shadow: 0 0 0 12px rgba(255, 133, 161, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 133, 161, 0); }
+        }
+
+        .map-heart-pulse {
+            animation: mapPulse 2s infinite;
+        }
+
+        /* Float Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .floating-element {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Soft Glow */
+        .glow-pink {
+            box-shadow: 0 0 25px rgba(255, 133, 161, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-gray-700 relative selection:bg-pastel-rose selection:text-pastel-darkRose">
+
+    <!-- Particle Canvas for Floating Hearts, Lilies & Planes -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Audio Control Ambient Toggle -->
+    <div class="fixed top-5 right-5 z-50">
+        <button id="bg-music-toggle" onclick="toggleMusic()" class="glass-card p-3 rounded-full text-pastel-darkRose hover:text-pastel-accent transition duration-300 shadow-md flex items-center gap-2 px-4 group">
+            <i id="music-icon" class="fas fa-music text-lg group-hover:scale-110 transition"></i>
+            <span id="music-text" class="text-xs font-semibold tracking-wide">Play LDR Melodies</span>
+        </button>
+    </div>
+
+    <!-- HERO SECTION -->
+    <header class="min-h-screen flex flex-col justify-center items-center relative px-4 py-16 text-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-pastel-sage/30 via-pastel-cream to-pastel-cream -z-10"></div>
+        
+        <!-- Animated Floating Motifs -->
+        <div class="absolute top-1/4 left-8 text-4xl floating-element opacity-80" style="filter: drop-shadow(0 4px 6px rgba(193, 215, 193, 0.5));">🪷</div>
+        <div class="absolute bottom-1/4 right-8 text-pastel-accent text-3xl floating-element opacity-70" style="animation-delay: 1.5s;">✈️</div>
+        <div class="absolute top-1/3 right-12 text-4xl floating-element opacity-70" style="animation-delay: 0.8s;">🪷</div>
+        <div class="absolute bottom-1/3 left-12 text-pastel-deepRose text-2xl floating-element opacity-60" style="animation-delay: 2.1s;">💌</div>
+
+        <div class="max-w-4xl mx-auto space-y-8 z-20">
+            <!-- Long Distance Badge -->
+            <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-pastel-rose/40 border border-pastel-accent/40 text-pastel-darkRose text-xs sm:text-sm font-bold tracking-wider uppercase shadow-sm">
+                <i class="fas fa-plane-arrival text-pastel-accent"></i>
+                <span>Miles Apart, But You're My Whole Heart 🪷❤️</span>
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-bold font-serif text-pastel-darkRose tracking-tight leading-tight">
+                I'm So Sorry, My Angel. <br/>
+                <span class="text-3xl sm:text-5xl font-sans font-normal text-gray-600 block mt-2">I Hate Being Far When You're Hurt 🥺</span>
+            </h1>
+
+            <p class="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto font-sans leading-relaxed">
+                The hardest part of long distance is not being able to hug you when I make a mistake. I broke your trust, and even across these miles, my heart aches knowing you are sad because of me.
+            </p>
+
+            <!-- Dual-Clock LDR Component -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto pt-2">
+                <!-- My Time (Chandimandir) -->
+                <div class="glass-card p-4 rounded-2xl border border-pastel-rose/60 flex items-center gap-4 text-left shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-pastel-pink flex items-center justify-center text-pastel-darkRose text-xl">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Chandimandir (My Home 🏠)</span>
+                        <div id="my-clock" class="text-xl font-bold text-gray-800 font-mono">--:--:--</div>
+                        <span class="text-xs text-pastel-darkRose font-semibold">Thinking about you every second 💭</span>
+                    </div>
+                </div>
+
+                <!-- Her Time (Assam) -->
+                <div class="glass-card p-4 rounded-2xl border border-pastel-leaf/60 flex items-center gap-4 text-left shadow-sm bg-pastel-sage/20">
+                    <div class="w-12 h-12 rounded-xl bg-pastel-leaf/40 flex items-center justify-center text-pastel-darkRose text-xl">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Assam (My Queen 🌸)</span>
+                            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        </div>
+                        <div id="her-clock" class="text-xl font-bold text-gray-800 font-mono">--:--:--</div>
+                        <span id="her-state-text" class="text-xs text-emerald-700 font-semibold">Always in my heart 🪷</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="scrollToSection('letter')" class="w-full sm:w-auto px-8 py-4 bg-pastel-accent text-white font-bold rounded-full shadow-lg hover:bg-pastel-darkRose transition duration-300 transform hover:-translate-y-1 glow-pink flex items-center justify-center gap-2">
+                    <span>Read My Letter Across The Miles</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                
+                <button onclick="sendVirtualHug()" class="w-full sm:w-auto px-8 py-4 glass-card text-pastel-darkRose font-bold rounded-full border border-pastel-rose hover:bg-pastel-rose/30 transition duration-300 flex items-center justify-center gap-2">
+                    <span>Send Virtual Hug Across Distance</span>
+                    <i class="fas fa-heart text-pastel-accent"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-pastel-darkRose flex flex-col items-center gap-1 cursor-pointer opacity-70 hover:opacity-100 transition" onclick="scrollToSection('map-section')">
+            <span class="text-xs font-semibold tracking-widest uppercase">Explore Our Trajectory</span>
+            <i class="fas fa-chevron-down animate-bounce text-sm"></i>
+        </div>
+    </header>
+
+    <!-- SECTION 1.5: INTERACTIVE DISTANCE MAP VISUALIZER -->
+    <section id="map-section" class="py-16 px-4 max-w-5xl mx-auto">
+        <div class="glass-card p-6 sm:p-10 rounded-3xl border-2 border-pastel-rose/70 shadow-xl relative overflow-hidden">
+            <div class="text-center mb-8">
+                <span class="text-xs font-bold tracking-widest text-pastel-darkRose uppercase bg-pastel-rose/40 px-3 py-1 rounded-full">Chandimandir ✈️ Assam Connection</span>
+                <h2 class="text-2xl sm:text-4xl font-serif font-bold text-pastel-darkRose mt-3">No Distance Can Dim My Love</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-2">A paper plane sending endless apologies & warmth from Chandimandir straight to Assam</p>
+            </div>
+
+            <!-- Map Box -->
+            <div class="relative bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 sm:p-10 text-white overflow-hidden shadow-inner border border-indigo-900/50">
+                <!-- Decorative Star Grid Canvas / Background -->
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+                <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-8 my-4">
+                    
+                    <!-- My Location Node (Chandimandir) -->
+                    <div class="flex flex-col items-center text-center space-y-2">
+                        <div class="w-14 h-14 rounded-full bg-pastel-accent/30 border-2 border-pastel-accent flex items-center justify-center text-2xl text-pastel-pink map-heart-pulse">
+                            📍
+                        </div>
+                        <span class="font-bold text-sm tracking-wide text-pastel-pink">Chandimandir</span>
+                        <span class="text-xs text-gray-400">Regretful & Missing You 🥺</span>
+                    </div>
+
+                    <!-- Animated Flight Path Vector -->
+                    <div class="w-full flex-1 relative flex items-center justify-center my-4 sm:my-0">
+                        <svg class="w-full h-16 overflow-visible" viewBox="0 0 300 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Curve path -->
+                            <path id="flight-path" d="M 10 40 Q 150 -20 290 40" stroke="rgba(255, 194, 209, 0.4)" stroke-width="2" fill="none"/>
+                            <path d="M 10 40 Q 150 -20 290 40" stroke="#FF85A1" stroke-width="2.5" fill="none" class="animate-dash"/>
+                            
+                            <!-- Animated Plane SVG along path -->
+                            <g>
+                                <path d="M -8 -4 L 8 0 L -8 4 L -3 0 Z" fill="#FFE5EC">
+                                    <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
+                                        <mpath href="#flight-path"/>
+                                    </animateMotion>
+                                </path>
+                            </g>
+                        </svg>
+
+                        <!-- Centered Distance Pill -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-xs text-pastel-pink font-semibold flex items-center gap-2 shadow-lg text-center">
+                            <i class="fas fa-heart text-pastel-accent animate-pulse"></i>
+                            <span>Connected across ~2,000 km, but connected in heart forever 💖</span>
+                        </div>
+                    </div>
+
+                    <!-- Her Location Node (Assam) -->
+                    <div class="flex flex-col items-center text-center space-y-2">
+                        <div class="w-14 h-14 rounded-full bg-pastel-leaf/40 border-2 border-pastel-leaf flex items-center justify-center text-2xl text-pastel-sage map-heart-pulse">
+                            🪷
+                        </div>
+                        <span class="font-bold text-sm tracking-wide text-pastel-sage">Assam</span>
+                        <span class="text-xs text-gray-400">My Favorite Person Ever 👑</span>
+                    </div>
+
+                </div>
+
+                <!-- Footer Motto -->
+                <div class="text-center pt-4 border-t border-white/10 text-xs text-gray-300 font-serif italic">
+                    "From Chandimandir to Assam: Distance tests how far love can travel. My love for you reaches past every kilometer."
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: SINCERE CONFESSION / UNFOLDING LETTER -->
+    <section id="letter" class="py-20 px-4 max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl sm:text-4xl font-serif font-bold text-pastel-darkRose mb-3">From Across The Distance</h2>
+            <div class="w-16 h-1 bg-pastel-accent mx-auto rounded-full"></div>
+            <p class="text-gray-500 text-sm mt-3">Click the envelope below to open my sincere long-distance apology letter</p>
+        </div>
+
+        <!-- Interactive Envelope / Letter Container -->
+        <div id="envelope-container" class="envelope glass-card rounded-3xl p-6 sm:p-10 transition-all duration-500 cursor-pointer border-2 border-pastel-rose shadow-xl hover:shadow-2xl relative overflow-hidden" onclick="toggleEnvelope()">
+            
+            <!-- Envelope Header/Prompt -->
+            <div id="envelope-header" class="flex flex-col items-center text-center py-8 transition duration-300">
+                <div class="w-20 h-20 bg-pastel-sage rounded-full flex items-center justify-center text-pastel-darkRose text-3xl mb-4 shadow-inner pulse-gentle border border-pastel-leaf">
+                    <i id="envelope-icon" class="fas fa-envelope-open"></i>
+                </div>
+                <h3 id="envelope-title" class="text-2xl font-serif font-bold text-pastel-darkRose">Click to Open My Heart 🪷</h3>
+                <p id="envelope-subtitle" class="text-sm text-gray-500 mt-2">I wrote this especially for you, admitting my mistakes and taking full accountability.</p>
+            </div>
+
+            <!-- Letter Body (Unfolds) -->
+            <div class="letter-content border-t border-pastel-rose/30 pt-6 mt-4">
+                <div class="font-handwriting text-2xl sm:text-3xl text-gray-800 leading-relaxed space-y-6 px-2 sm:px-6">
+                    <p class="text-pastel-darkRose font-bold text-3xl">My Dearest Sweetheart,</p>
+                    
+                    <p>
+                        I am writing this with a very heavy heart from Chandimandir. The hardest part about being in a long-distance relationship isn't the distance to Assam or the kilometers between us—it's knowing that I caused you pain and I am not right there beside you to pull you close, hold your hands, and tell you how deeply sorry I am.
+                    </p>
+                    
+                    <p>
+                        I broke your trust, and seeing you sad all the way in Assam makes me feel so helpless and ashamed. Your faith in me is the most precious thing I hold, and I hate that I let you down. You have every right to feel hurt, angry, and distant right now. Your feelings are completely valid, and I promise never to minimize them.
+                    </p>
+                    
+                    <p>
+                        I broke your trust, and seeing you sad makes me feel so helpless and ashamed. Your faith in me is the most precious thing I hold, and I hate that I let you down. You have every right to feel hurt, angry, and distant right now. Your feelings are completely valid, and I promise never to minimize them.
+                    </p>
+                    
+                    <p>
+                        Just like your favorite white lilies, your grace and love mean the entire world to me. I don't want distance or poor choices to ever weaken what we built. I am genuinely committed to changing, listening better, and showing up for you with 100% honesty and care every single day.
+                    </p>
+
+                    <p>
+                        Please take all the time you need, my love. I will be right here on the other end of the line, waiting patiently and consistently taking actions to rebuild your trust, step by step.
+                    </p>
+
+                    <div class="pt-6 text-right font-serif italic text-xl text-pastel-darkRose">
+                        Forever & Faithfully Yours Across The Miles,<br>
+                        <span class="font-handwriting text-3xl font-bold not-italic">The One Who Is Deeply Sorry ❤️</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Close Helper text inside letter -->
+            <div id="close-hint" class="hidden text-center text-xs text-pastel-darkRose mt-8 pt-4 border-t border-pastel-rose/20 font-semibold uppercase tracking-wider">
+                (Click anywhere on this card to fold letter back)
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: PROMISES & STEPS TO CHANGE (LDR TAILORED) -->
+    <section class="py-20 bg-gradient-to-b from-pastel-cream via-pastel-pink/30 to-pastel-cream px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="text-xs font-bold tracking-widest text-pastel-darkRose uppercase bg-pastel-rose/40 px-3 py-1 rounded-full">My LDR Vows To You</span>
+                <h2 class="text-3xl sm:text-4xl font-serif font-bold text-pastel-darkRose mt-3 mb-4">How I Will Fix & Change Myself</h2>
+                <p class="text-gray-600 max-w-xl mx-auto">Words are easy, but actions span any distance. Here are my concrete promises to rebuild your faith in me:</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Promise Card 1 -->
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-l-pastel-accent glass-card-hover relative overflow-hidden group">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-pastel-pink rounded-xl text-pastel-darkRose text-2xl group-hover:bg-pastel-accent group-hover:text-white transition duration-300">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-xl font-bold text-gray-800">1. Priority Video Call Dates</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Never making you feel like an afterthought. Giving you my 100% undivided attention without distractions during our calls.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promise Card 2 -->
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-l-pastel-accent glass-card-hover relative overflow-hidden group">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-pastel-pink rounded-xl text-pastel-darkRose text-2xl group-hover:bg-pastel-accent group-hover:text-white transition duration-300">
+                            <i class="fas fa-[#FF85A1] fa-shield-heart"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-xl font-bold text-gray-800">2. Radical LDR Transparency</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Complete openness about my day, plans, and thoughts. No misunderstandings or secrets—ensuring you feel completely secure.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promise Card 3 -->
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-l-pastel-accent glass-card-hover relative overflow-hidden group">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-pastel-pink rounded-xl text-pastel-darkRose text-2xl group-hover:bg-pastel-accent group-hover:text-white transition duration-300">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-xl font-bold text-gray-800">3. Active Emotional Presence</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Even when miles apart, being your immediate shoulder to lean on. Always listening patiently without getting defensive.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promise Card 4 -->
+                <div class="glass-card p-6 rounded-2xl border-l-4 border-l-pastel-accent glass-card-hover relative overflow-hidden group">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-pastel-pink rounded-xl text-pastel-darkRose text-2xl group-hover:bg-pastel-accent group-hover:text-white transition duration-300">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-xl font-bold text-gray-800">4. Working Towards Next Visit</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Actively planning and dedicating efforts to close the gap so I can hold you in person and never let go.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Interactive Checklist Box -->
+            <div class="mt-10 glass-card p-6 sm:p-8 rounded-3xl border border-pastel-rose text-center max-w-2xl mx-auto">
+                <h4 class="text-lg font-bold text-pastel-darkRose mb-4">Tap each heart as I promise to fulfill these daily:</h4>
+                <div class="flex flex-wrap justify-center gap-3" id="promise-check-container">
+                    <button onclick="togglePromiseCheck(this)" class="px-4 py-2 rounded-full border border-pastel-rose bg-white text-gray-700 text-sm flex items-center gap-2 hover:bg-pastel-pink transition">
+                        <i class="far fa-heart text-pastel-accent"></i> Good Morning / Goodnight Messages
+                    </button>
+                    <button onclick="togglePromiseCheck(this)" class="px-4 py-2 rounded-full border border-pastel-rose bg-white text-gray-700 text-sm flex items-center gap-2 hover:bg-pastel-pink transition">
+                        <i class="far fa-heart text-pastel-accent"></i> Random Surprise Care Packages
+                    </button>
+                    <button onclick="togglePromiseCheck(this)" class="px-4 py-2 rounded-full border border-pastel-rose bg-white text-gray-700 text-sm flex items-center gap-2 hover:bg-pastel-pink transition">
+                        <i class="far fa-heart text-pastel-accent"></i> Unconditional Patience
+                    </button>
+                    <button onclick="togglePromiseCheck(this)" class="px-4 py-2 rounded-full border border-pastel-rose bg-white text-gray-700 text-sm flex items-center gap-2 hover:bg-pastel-pink transition">
+                        <i class="far fa-heart text-pastel-accent"></i> Always Reassuring You
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: REASONS WHY YOU MEAN THE WORLD TO ME (FLIP CARDS) -->
+    <section class="py-20 px-4 max-w-5xl mx-auto">
+        <div class="text-center mb-16">
+            <span class="text-xs font-bold tracking-widest text-pastel-darkRose uppercase bg-pastel-lavender/60 px-3 py-1 rounded-full">Reminders Of My Love</span>
+            <h2 class="text-3xl sm:text-4xl font-serif font-bold text-pastel-darkRose mt-3 mb-2">Why Distance Can Never Change My Feelings</h2>
+            <p class="text-gray-500 text-sm">Click each cute card to reveal what I cherish about you</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Card 1 -->
+            <div class="flip-card h-64 cursor-pointer perspective-1000" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full text-center rounded-2xl shadow-md transition-all duration-500">
+                    <div class="flip-card-front absolute inset-0 w-full h-full glass-card rounded-2xl flex flex-col items-center justify-center p-6 border border-pastel-rose">
+                        <div class="text-4xl mb-3">📱</div>
+                        <h3 class="font-bold text-lg text-pastel-darkRose">Our Late Night Calls</h3>
+                        <p class="text-xs text-gray-400 mt-2">Tap to flip 💖</p>
+                    </div>
+                    <div class="flip-card-back absolute inset-0 w-full h-full bg-gradient-to-br from-pastel-rose to-pastel-accent text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-inner">
+                        <p class="font-handwriting text-2xl leading-snug">"Falling asleep while hearing your voice on the phone is the highlight of my every single day."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="flip-card h-64 cursor-pointer perspective-1000" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full text-center rounded-2xl shadow-md transition-all duration-500">
+                    <div class="flip-card-front absolute inset-0 w-full h-full glass-card rounded-2xl flex flex-col items-center justify-center p-6 border border-pastel-rose">
+                        <div class="text-4xl mb-3">🪷</div>
+                        <h3 class="font-bold text-lg text-pastel-darkRose">Your Lily-Like Purity</h3>
+                        <p class="text-xs text-gray-400 mt-2">Tap to flip 💖</p>
+                    </div>
+                    <div class="flip-card-back absolute inset-0 w-full h-full bg-gradient-to-br from-pastel-leaf to-pastel-sage text-gray-800 rounded-2xl flex flex-col items-center justify-center p-6 shadow-inner">
+                        <p class="font-handwriting text-2xl leading-snug font-bold text-pastel-darkRose">"Your heart is as pure and beautiful as a lily. You bring peace and beauty into my messy world."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="flip-card h-64 cursor-pointer perspective-1000" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full text-center rounded-2xl shadow-md transition-all duration-500">
+                    <div class="flip-card-front absolute inset-0 w-full h-full glass-card rounded-2xl flex flex-col items-center justify-center p-6 border border-pastel-rose">
+                        <div class="text-4xl mb-3">✈️</div>
+                        <h3 class="font-bold text-lg text-pastel-darkRose">The Magic of Reunions</h3>
+                        <p class="text-xs text-gray-400 mt-2">Tap to flip 💖</p>
+                    </div>
+                    <div class="flip-card-back absolute inset-0 w-full h-full bg-gradient-to-br from-pastel-rose to-pastel-accent text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-inner">
+                        <p class="font-handwriting text-2xl leading-snug">"That feeling when I see you walking towards me at the airport is worth every single second of waiting."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="flip-card h-64 cursor-pointer perspective-1000" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full text-center rounded-2xl shadow-md transition-all duration-500">
+                    <div class="flip-card-front absolute inset-0 w-full h-full glass-card rounded-2xl flex flex-col items-center justify-center p-6 border border-pastel-rose">
+                        <div class="text-4xl mb-3">💌</div>
+                        <h3 class="font-bold text-lg text-pastel-darkRose">Your Gentle Patience</h3>
+                        <p class="text-xs text-gray-400 mt-2">Tap to flip 💖</p>
+                    </div>
+                    <div class="flip-card-back absolute inset-0 w-full h-full bg-gradient-to-br from-pastel-rose to-pastel-accent text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-inner">
+                        <p class="font-handwriting text-2xl leading-snug">"You have given me so much understanding and kindness. I promise never to take your gentle soul for granted."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="flip-card h-64 cursor-pointer perspective-1000" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full text-center rounded-2xl shadow-md transition-all duration-500">
+                    <div class="flip-card-front absolute inset-0 w-full h-full glass-card rounded-2xl flex flex-col items-center justify-center p-6 border border-pastel-rose">
+                        <div class="text-4xl mb-3">🥺</div>
+                        <h3 class="font-bold text-lg text-pastel-darkRose">Your Cute Sleepy Voice</h3>
+                        <p class="text-xs text-gray-400 mt-2">Tap to flip 💖</p>
+                    </div>
+                    <div class="flip-card-back absolute inset-0 w-full h-full bg-gradient-to-br from-pastel-rose to-pastel-accent text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-inner">
+                        <p class="font-handwriting text-2xl leading-snug">"Hearing your sleepy morning voice when you wake up is my absolute favorite sound in the whole world."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="flip-card h-64 cursor-pointer perspective-1000" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner relative w-full h-full text-center rounded-2xl shadow-md transition-all duration-500">
+                    <div class="flip-card-front absolute inset-0 w-full h-full glass-card rounded-2xl flex flex-col items-center justify-center p-6 border border-pastel-rose">
+                        <div class="text-4xl mb-3">👑</div>
+                        <h3 class="font-bold text-lg text-pastel-darkRose">My Forever Person</h3>
+                        <p class="text-xs text-gray-400 mt-2">Tap to flip 💖</p>
+                    </div>
+                    <div class="flip-card-back absolute inset-0 w-full h-full bg-gradient-to-br from-pastel-rose to-pastel-accent text-white rounded-2xl flex flex-col items-center justify-center p-6 shadow-inner">
+                        <p class="font-handwriting text-2xl leading-snug">"No matter how many miles separate us right now, my heart belongs solely and permanently to you."</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 5: OUR SWEET LDR MOMENTS GALLERY -->
+    <section id="memory-lane" class="py-20 bg-gradient-to-b from-pastel-cream via-pastel-sage/20 to-pastel-cream px-4 relative">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12 relative">
+                <span class="text-xs font-bold tracking-widest text-pastel-darkRose uppercase bg-pastel-sage px-4 py-1.5 rounded-full border border-pastel-leaf/60">
+                    🪷 Screen Memories & Visits 🪷
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-serif font-bold text-pastel-darkRose mt-3 mb-3">Our Long Distance Sweet Moments</h2>
+                <p class="text-gray-600 max-w-xl mx-auto text-sm sm:text-base">
+                    From late-night video call screenshots to ticket stubs and unforgettable visits. Click any memory to enlarge, or add new ones together!
+                </p>
+                <div class="w-24 h-1 bg-pastel-accent mx-auto rounded-full mt-4"></div>
+            </div>
+
+            <!-- Photo Upload Zone -->
+            <div class="max-w-2xl mx-auto mb-12 glass-card p-6 rounded-3xl border-2 border-dashed border-pastel-accent/60 text-center relative hover:bg-white/80 transition group">
+                <input type="file" id="photo-upload-input" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handlePhotoUpload(event)">
+                <div class="space-y-3 pointer-events-none">
+                    <div class="w-14 h-14 bg-pastel-pink rounded-full flex items-center justify-center mx-auto text-pastel-darkRose text-2xl group-hover:scale-110 transition duration-300">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800">Add Call Screenshots or Visit Photos</h3>
+                    <p class="text-xs text-gray-500">Tap or drag photos here to add our sweet long-distance memories 💕</p>
+                    <span class="inline-block px-4 py-1.5 bg-pastel-accent text-white text-xs font-bold rounded-full shadow-sm">Upload LDR Memory</span>
+                </div>
+            </div>
+
+            <!-- Polaroid Grid -->
+            <div id="polaroid-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 px-2">
+                
+                <!-- Polaroid Item 1 -->
+                <div class="polaroid-card glass-card p-4 pb-6 rounded-sm bg-white shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 transform -rotate-1 relative group cursor-pointer" onclick="openLightbox(0)">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-pastel-sage/70 backdrop-blur-sm border border-pastel-leaf/40 rotate-1 shadow-sm z-10"></div>
+                    <div class="overflow-hidden rounded-sm aspect-4/3 bg-pastel-pink/30 relative flex items-center justify-center">
+                        <img id="img-0" src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80" alt="Video Call Memory" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://placehold.co/600x400/ffe5ec/d85a7f?text=Late+Night+Calls+📱';">
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-sm font-semibold gap-2">
+                            <i class="fas fa-search-plus"></i> View Memory
+                        </div>
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p id="caption-0" class="font-handwriting text-2xl text-gray-800 font-bold">Falling Asleep On Call 📱</p>
+                        <p class="text-xs text-gray-400 mt-1 font-sans">Click to expand note</p>
+                    </div>
+                </div>
+
+                <!-- Polaroid Item 2 -->
+                <div class="polaroid-card glass-card p-4 pb-6 rounded-sm bg-white shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 transform rotate-2 relative group cursor-pointer" onclick="openLightbox(1)">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-pastel-rose/70 backdrop-blur-sm border border-pastel-accent/40 -rotate-2 shadow-sm z-10"></div>
+                    <div class="overflow-hidden rounded-sm aspect-4/3 bg-pastel-pink/30 relative flex items-center justify-center">
+                        <img id="img-1" src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80" alt="Airport Hug Memory" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://placehold.co/600x400/e3ebd8/d85a7f?text=Airport+Reunion+✈️';">
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-sm font-semibold gap-2">
+                            <i class="fas fa-search-plus"></i> View Memory
+                        </div>
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p id="caption-1" class="font-handwriting text-2xl text-gray-800 font-bold">The Magic Airport Reunion ✈️</p>
+                        <p class="text-xs text-gray-400 mt-1 font-sans">Click to expand note</p>
+                    </div>
+                </div>
+
+                <!-- Polaroid Item 3 -->
+                <div class="polaroid-card glass-card p-4 pb-6 rounded-sm bg-white shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 transform -rotate-2 relative group cursor-pointer" onclick="openLightbox(2)">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-pastel-lavender/70 backdrop-blur-sm border border-pastel-rose/40 rotate-1 shadow-sm z-10"></div>
+                    <div class="overflow-hidden rounded-sm aspect-4/3 bg-pastel-pink/30 relative flex items-center justify-center">
+                        <img id="img-2" src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=800&q=80" alt="Lily Date Memory" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='https://placehold.co/600x400/f0e6ff/d85a7f?text=Lilies+%26+Warmth+🪷';">
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-sm font-semibold gap-2">
+                            <i class="fas fa-search-plus"></i> View Memory
+                        </div>
+                    </div>
+                    <div class="pt-4 text-center">
+                        <p id="caption-2" class="font-handwriting text-2xl text-gray-800 font-bold">Holding You In Person 🤍</p>
+                        <p class="text-xs text-gray-400 mt-1 font-sans">Click to expand note</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- LIGHTBOX MODAL FOR MEMORY DETAIL -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4" onclick="closeLightbox(event)">
+        <div class="glass-card bg-white p-6 sm:p-8 rounded-3xl max-w-2xl w-full border-2 border-pastel-rose shadow-2xl relative animate-scale-up" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 text-gray-400 hover:text-pastel-darkRose text-2xl transition">
+                <i class="fas fa-times-circle"></i>
+            </button>
+            <div class="rounded-2xl overflow-hidden max-h-[60vh] bg-gray-100 mb-6 flex items-center justify-center">
+                <img id="lightbox-img" src="" alt="Enlarged Memory" class="w-full h-full object-contain max-h-[55vh]">
+            </div>
+            <div class="text-center space-y-3">
+                <h3 id="lightbox-caption" class="font-serif font-bold text-2xl sm:text-3xl text-pastel-darkRose"></h3>
+                <p id="lightbox-note" class="font-handwriting text-2xl text-gray-700 leading-relaxed max-w-lg mx-auto">
+                    "Every second spent on screen or in person with you is a core memory I hold dearly."
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: INTERACTIVE LDR HUG & FORGIVENESS STATION -->
+    <section id="forgive-section" class="py-20 bg-gradient-to-b from-pastel-cream via-pastel-pink/40 to-pastel-pink/60 px-4 text-center relative">
+        <div class="max-w-3xl mx-auto space-y-8 glass-card p-8 sm:p-12 rounded-3xl border-2 border-pastel-rose shadow-2xl relative overflow-hidden">
+            
+            <div class="space-y-3">
+                <div class="text-5xl animate-bounce">🥺👉👈</div>
+                <h2 class="text-3xl sm:text-5xl font-serif font-bold text-pastel-darkRose">Can We Make Up Across The Miles?</h2>
+                <p class="text-gray-600 text-base max-w-md mx-auto">
+                    Take your time, my angel. Distance is hard, but my heart is 100% yours.
+                </p>
+            </div>
+
+            <!-- LDR Virtual Hug & Kisses Station -->
+            <div class="py-2 space-y-4">
+                <button onclick="sendVirtualHug(event)" class="px-8 py-4 bg-pastel-rose hover:bg-pastel-accent text-pastel-darkRose hover:text-white font-bold rounded-full shadow-md transition duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto border border-pastel-accent/30">
+                    <i class="fas fa-paper-plane text-xl"></i>
+                    <span>Send Flying Kisses & Hugs Across Distance ✈️💖</span>
+                </button>
+            </div>
+
+            <hr class="border-pastel-rose/40 my-6">
+
+            <!-- Forgiveness Decision Buttons -->
+            <div id="forgive-buttons-wrapper" class="flex flex-col sm:flex-row items-center justify-center gap-6 relative min-h-[100px]">
+                
+                <!-- Yes Button -->
+                <button id="btn-forgive" onclick="handleForgiveness()" class="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-pastel-accent to-pastel-darkRose text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-110 flex items-center justify-center gap-3 glow-pink z-10">
+                    <i class="fas fa-heart text-xl"></i>
+                    <span>I Forgive You 💕</span>
+                </button>
+
+                <!-- Need Time Button (Playfully evasive or supportive) -->
+                <button id="btn-time" onclick="handleNeedTime()" class="w-full sm:w-auto px-8 py-4 glass-card text-pastel-darkRose font-bold rounded-full border border-pastel-rose hover:bg-white transition duration-300 text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-clock"></i>
+                    <span>Need Time But Send Hugs 🥺</span>
+                </button>
+
+            </div>
+
+            <!-- Dynamic Response Message Box -->
+            <div id="response-box" class="hidden mt-6 p-6 rounded-2xl bg-white/80 border border-pastel-rose text-pastel-darkRose font-serif text-xl animate-fade-in shadow-inner">
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Celebration Modal (Appears when she forgives) -->
+    <div id="celebration-modal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card bg-white p-8 sm:p-12 rounded-3xl max-w-lg w-full text-center space-y-6 border-4 border-pastel-rose shadow-2xl relative animate-scale-up">
+            <div class="text-6xl">✈️🎉🥰💖</div>
+            <h3 class="text-3xl font-serif font-bold text-pastel-darkRose">Thank You, My Angel!</h3>
+            <p class="text-gray-600 leading-relaxed font-sans">
+                I promise to hold your trust like the most fragile glass and love you harder every single day, no matter how many miles separate us. I can't wait until I hold you in my arms again!
+            </p>
+            <div class="p-4 bg-pastel-pink/50 rounded-2xl font-handwriting text-2xl text-pastel-darkRose">
+                "Distance means so little when someone means so much."
+            </div>
+            <button onclick="closeModal()" class="w-full py-4 bg-pastel-accent text-white font-bold rounded-full shadow-md hover:bg-pastel-darkRose transition">
+                Call Me Right Now 📞💖
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* === Dual Real-Time Clock Functionality === */
+        function updateClocks() {
+            // Standard IST Time for both Chandimandir and Assam (Asia/Kolkata)
+            const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const now = new Date();
+            
+            // Format Chandimandir Time
+            const myTimeString = now.toLocaleTimeString('en-US', options);
+            document.getElementById('my-clock').innerText = myTimeString;
+
+            // Format Assam Time
+            const herTimeString = now.toLocaleTimeString('en-US', options);
+            document.getElementById('her-clock').innerText = herTimeString;
+
+            // Her State Indicator based on hour
+            const hour = now.getHours();
+            const herStateText = document.getElementById('her-state-text');
+            if (hour >= 23 || hour < 7) {
+                herStateText.innerText = "Sleeping peacefully in Assam 🌙";
+            } else if (hour >= 7 && hour < 12) {
+                herStateText.innerText = "Waking up & shining bright ☀️";
+            } else {
+                herStateText.innerText = "Thinking of you in Assam 🪷";
+            }
+        }
+        setInterval(updateClocks, 1000);
+        updateClocks();
+
+        /* === Canvas Particles (Hearts, Lilies, Airplanes) === */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class LDRParticle {
+            constructor(x, y, isBurst = false) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || (isBurst ? y : canvas.height + 20);
+                this.size = Math.random() * 12 + 8;
+                this.speedY = isBurst ? (Math.random() - 0.8) * 6 : -(Math.random() * 1.5 + 0.5);
+                this.speedX = isBurst ? (Math.random() - 0.5) * 6 : (Math.random() - 0.5) * 1.2;
+                this.opacity = Math.random() * 0.7 + 0.3;
+                
+                // Particle types: Heart, Lily, Airplane
+                const rand = Math.random();
+                if (rand < 0.5) this.type = 'heart';
+                else if (rand < 0.85) this.type = 'lily';
+                else this.type = 'plane';
+
+                this.color = ['#FF85A1', '#FFC2D1', '#C1D7C1', '#E3EBD8', '#D85A7F'][Math.floor(Math.random() * 5)];
+                this.rotation = Math.random() * Math.PI * 2;
+                this.isBurst = isBurst;
+                this.life = isBurst ? 100 : Infinity;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                
+                if (this.type === 'heart') {
+                    ctx.beginPath();
+                    const topCurveHeight = this.size * 0.3;
+                    ctx.moveTo(0, topCurveHeight);
+                    ctx.bezierCurveTo(0, 0, -this.size / 2, 0, -this.size / 2, topCurveHeight);
+                    ctx.bezierCurveTo(-this.size / 2, (this.size + topCurveHeight) / 2, 0, this.size, 0, this.size);
+                    ctx.bezierCurveTo(0, this.size, this.size / 2, (this.size + topCurveHeight) / 2, this.size / 2, topCurveHeight);
+                    ctx.bezierCurveTo(this.size / 2, 0, 0, 0, 0, topCurveHeight);
+                    ctx.closePath();
+                    ctx.fill();
+                } else if (this.type === 'lily') {
+                    // Lily petaled shape
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        ctx.rotate((Math.PI * 2) / 5);
+                        ctx.moveTo(0, 0);
+                        ctx.quadraticCurveTo(this.size / 2, -this.size, 0, -this.size * 1.4);
+                        ctx.quadraticCurveTo(-this.size / 2, -this.size, 0, 0);
+                    }
+                    ctx.fill();
+                } else if (this.type === 'plane') {
+                    // Cute Paper Plane shape
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size);
+                    ctx.lineTo(this.size / 2, this.size / 2);
+                    ctx.lineTo(0, this.size / 4);
+                    ctx.lineTo(-this.size / 2, this.size / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                
+                if (this.isBurst) {
+                    this.life--;
+                    this.opacity -= 0.01;
+                } else if (this.y < -20) {
+                    this.y = canvas.height + 20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        for (let i = 0; i < 30; i++) {
+            particles.push(new LDRParticle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if (p.isBurst && (p.life <= 0 || p.opacity <= 0)) {
+                    particles.splice(index, 1);
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function sendVirtualHug(e) {
+            const x = e ? e.clientX : window.innerWidth / 2;
+            const y = e ? e.clientY : window.innerHeight / 2;
+
+            for (let i = 0; i < 35; i++) {
+                particles.push(new LDRParticle(x, y, true));
+            }
+        }
+
+        /* === Smooth Scroll Helper === */
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* === Envelope / Letter Toggle === */
+        let envelopeOpen = false;
+        function toggleEnvelope() {
+            const envelope = document.getElementById('envelope-container');
+            const icon = document.getElementById('envelope-icon');
+            const title = document.getElementById('envelope-title');
+            const subtitle = document.getElementById('envelope-subtitle');
+            const closeHint = document.getElementById('close-hint');
+
+            envelopeOpen = !envelopeOpen;
+
+            if (envelopeOpen) {
+                envelope.classList.add('open');
+                icon.className = 'fas fa-paper-plane text-pastel-darkRose';
+                title.innerText = 'My Letter Across The Miles 🪷';
+                subtitle.innerText = 'Thank you for reading this with an open heart.';
+                closeHint.classList.remove('hidden');
+            } else {
+                envelope.classList.remove('open');
+                icon.className = 'fas fa-envelope-open';
+                title.innerText = 'Click to Open My Heart 🪷';
+                subtitle.innerText = 'I wrote this especially for you, admitting my mistakes.';
+                closeHint.classList.add('hidden');
+            }
+        }
+
+        /* === Promise Checklist Handler === */
+        function togglePromiseCheck(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.className = 'fas fa-heart text-pastel-accent';
+                btn.classList.add('bg-pastel-pink', 'border-pastel-accent', 'font-bold');
+            } else {
+                icon.className = 'far fa-heart text-pastel-accent';
+                btn.classList.remove('bg-pastel-pink', 'border-pastel-accent', 'font-bold');
+            }
+        }
+
+        /* === Forgiveness Button Handlers === */
+        let timeAttempts = 0;
+
+        function handleForgiveness() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 140,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#FF85A1', '#FFC2D1', '#FFB3C6', '#D85A7F', '#C1D7C1']
+                });
+            }
+            document.getElementById('celebration-modal').classList.remove('hidden');
+        }
+
+        function handleNeedTime() {
+            timeAttempts++;
+            const responseBox = document.getElementById('response-box');
+            responseBox.classList.remove('hidden');
+
+            const messages = [
+                "Take all the time you need across the miles, my angel. I will be right here waiting with infinite warmth and love. 🥺❤️",
+                "Distance is tough, but my patience for you is unlimited. I will keep proving my love to you every single day on screen and off. ✈️🌸",
+                "Sending you a giant box of virtual cuddles, sweet lilies, and warm tea. I'll be right here whenever you want to talk. 🧸💕"
+            ];
+
+            responseBox.innerText = messages[(timeAttempts - 1) % messages.length];
+
+            const btnTime = document.getElementById('btn-time');
+            btnTime.style.transform = `translate(${(Math.random() - 0.5) * 30}px, ${(Math.random() - 0.5) * 20}px)`;
+        }
+
+        function closeModal() {
+            document.getElementById('celebration-modal').classList.add('hidden');
+        }
+
+        /* === LDR Photo Gallery & Lightbox Logic === */
+        const ldrNotes = [
+            "Falling asleep together on call makes the distance disappear. You are my favorite bedtime story.",
+            "That airport hug where time literally stops. I can't wait for the next time I get to squeeze you tight.",
+            "Holding your hand in person is the best feeling in the world. My sweet lily, you are worth every mile."
+        ];
+
+        let galleryItems = [
+            { src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80", caption: "Falling Asleep On Call 📱", note: ldrNotes[0] },
+            { src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80", caption: "The Magic Airport Reunion ✈️", note: ldrNotes[1] },
+            { src: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=800&q=80", caption: "Holding You In Person 🤍", note: ldrNotes[2] }
+        ];
+
+        function openLightbox(index) {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            const note = document.getElementById('lightbox-note');
+
+            const item = galleryItems[index];
+            if (!item) return;
+
+            img.src = item.src;
+            caption.innerText = item.caption;
+            note.innerText = item.note || `"You bring so much joy into my life. I love you and I'm so sorry!"`;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+        }
+
+        function handlePhotoUpload(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            const grid = document.getElementById('polaroid-grid');
+
+            Array.from(files).forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const newIndex = galleryItems.length;
+                    const newCaption = `LDR Memory #${newIndex + 1} ✈️💕`;
+                    const newNote = "A special long-distance moment uploaded with love! Distance means nothing when you mean everything.";
+
+                    galleryItems.push({
+                        src: event.target.result,
+                        caption: newCaption,
+                        note: newNote
+                    });
+
+                    const tiltClass = newIndex % 2 === 0 ? '-rotate-1' : 'rotate-2';
+                    const cardHtml = `
+                        <div class="polaroid-card glass-card p-4 pb-6 rounded-sm bg-white shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 transform ${tiltClass} relative group cursor-pointer animate-fade-in" onclick="openLightbox(${newIndex})">
+                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-6 bg-pastel-sage/70 backdrop-blur-sm border border-pastel-leaf/40 rotate-1 shadow-sm z-10"></div>
+                            <div class="overflow-hidden rounded-sm aspect-4/3 bg-pastel-pink/30 relative flex items-center justify-center">
+                                <img src="${event.target.result}" alt="Uploaded LDR Memory" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-sm font-semibold gap-2">
+                                    <i class="fas fa-search-plus"></i> View Memory
+                                </div>
+                            </div>
+                            <div class="pt-4 text-center">
+                                <p class="font-handwriting text-2xl text-gray-800 font-bold">${newCaption}</p>
+                                <p class="text-xs text-gray-400 mt-1 font-sans">Click to expand note</p>
+                            </div>
+                        </div>
+                    `;
+
+                    grid.insertAdjacentHTML('beforeend', cardHtml);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /* === Soft Ambient Synth Audio Generator === */
+        let audioCtx = null;
+        let isPlaying = false;
+        let oscillator = null;
+        let gainNode = null;
+
+        function toggleMusic() {
+            const musicText = document.getElementById('music-text');
+            const musicIcon = document.getElementById('music-icon');
+
+            if (!isPlaying) {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // Soft warm note
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(350, audioCtx.currentTime);
+
+                gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 3);
+
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.start();
+                isPlaying = true;
+                musicText.innerText = "Playing Melodies ✨";
+                musicIcon.className = "fas fa-heart text-pastel-accent animate-pulse";
+            } else {
+                if (gainNode) {
+                    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+                    setTimeout(() => {
+                        if (oscillator) oscillator.stop();
+                        isPlaying = false;
+                    }, 1000);
+                }
+                musicText.innerText = "Play LDR Melodies";
+                musicIcon.className = "fas fa-music text-lg";
+            }
+        }
+    </script>
+</body>
+</html>
